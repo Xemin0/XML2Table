@@ -9,6 +9,12 @@ It simply converts between the copy-pasted XML contents and a visual (upper-tria
 - `TkInter`
 - `Numpy`
 
+### How to Use it
+Either:
+- Copy-paste the contact energy section/plugin from the CC3D generated XML file into the text field on the left
+- Start from scratch by adding new cells
+
+Then each button literally does what it says.
 
 ### Example Image of the Widget
 <img src="./images/example.png">
