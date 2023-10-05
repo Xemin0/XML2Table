@@ -6,10 +6,16 @@ It simply converts between the copy-pasted XML contents and a visual (upper-tria
 *Could be adapted for other parameter-settings in XML.*
 
 ### Required Python Packages
+- Python 3.10.12 (Other python should also work)
 - `TkInter`
 - `Numpy`
 
 ### How to Use it
+- Start the program by running 
+```bash
+python xml2table_v01.py
+```
+
 Either:
 - Copy-paste the contact energy section/plugin from the CC3D generated XML file into the text field on the left
 - Start from scratch by adding new cells
