@@ -13,7 +13,7 @@ It simply converts between the copy-pasted XML contents and a visual (upper-tria
 ### How to Use it
 - Start the program by running 
 ```bash
-python xml2table_v01.py
+python xml2table_v{current_version_number}.py
 ```
 
 Either:
