@@ -8,6 +8,7 @@
 ### Future Features:
 - Left-Justified the table (the table starts at the bottom left corner) **Need to handle the visual bugs unless re-rendering the whole frame**
 - Make the color bar dynamic and have dots or pins showing the distribution of entry values along the color bar
+- A Graph representation (Node-Edge) is probably better visually, but it would require advanced graphical designs
 
 ### Major Issues:
 #### Juxtapositions of Visual Components
