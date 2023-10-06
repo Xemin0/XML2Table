@@ -101,7 +101,10 @@ class EventHandler:
             entry = tk.Entry(master = self.frame4table, width = 5)
             entry.grid(row = 1, column = 1)
             entry.insert(0, self.table[0,0])
+            # set the initial color ???
+            #color = self.compute_color(self.table[0,0], )
             self.entries.append([entry, None])
+
 
         else:
             #N = len(self.names)
@@ -134,6 +137,8 @@ class EventHandler:
                             #if self.table[i,j] > 0: # Excluding non-positive values
                             color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
                             entry.configure(bg = color)
+                            # if the color range of the bg is light, need to set the text color to black
+                            entry.configure(foreground = "black")
 
                             self.diag_entries.append(entry) # Store the created entry for event function binding
 
@@ -159,6 +164,10 @@ class EventHandler:
                             color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
                             twin_entries.entry1.configure(bg = color)
                             twin_entries.entry2.configure(bg = color)
+
+                            # if the color range of the bg is light, need to set the text color to black
+                            twin_entries.entry1.configure(foreground = "black")
+                            twin_entries.entry2.configure(foreground = "black")
 
                             row_entries.append([twin_entries.entry1, twin_entries.entry2])
                 self.entries.append(row_entries)
