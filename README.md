@@ -35,6 +35,6 @@ Then each button literally does what it says.
 - The color dynamically assigned is still based on the initial min_max pair
 - Entering a new value in an entry does not change the value stored
 - Thus, entering a new value only changes the exact synced entry pair, but other entries are not updated accordingly.
-- The colors are not equally spaced either.
+- The colors are not equally spaced (as in the color bar)
 
 **A workaround is to use the `Convert to XML` button to recollect the values altogether, then `Convert to Table` to color the entries again as a whole.**
