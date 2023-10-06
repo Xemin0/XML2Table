@@ -22,5 +22,17 @@ Either:
 
 Then each button literally does what it says.
 
+### Major Features
+- 
+
 ### Example Image of the Widget
-<img src="./images/example.png">
+<img src="./images/example_v02.png">
+
+
+### Major Issues:                                                                                            
+#### Interactive Logic
+- The color dynamically assigned is still based on the initial min_max pair
+- Entering a new value in an entry does not change the value stored
+- Thus, entering a new value only changes the exact synced entry pair, but other entries are not updated accordingly.
+
+**A workaround is to use the `Convert to XML` button to recollect the values altogether, then `Convert to Table` to color the entries again as a whole.**

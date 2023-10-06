@@ -1,7 +1,8 @@
 import tkinter as tk
 import numpy as np
-from xml_processing.xml_parser import names_and_values
 from tkinter import simpledialog, messagebox
+
+from .xml_processing.xml_parser import names_and_values
 
 
 """
@@ -48,7 +49,7 @@ class EventHandler:
                                                          # Char count starts at 0
         self.names, self.table = names_and_values(self.rawXML)
         # Create the table and render it inside the corresponding frame
-        self.renderTable()
+        self.renderTable2()
 
     def renderTable(self):
         """
@@ -85,6 +86,107 @@ class EventHandler:
                         row_entries.append(entry)
                 self.entries.append(row_entries)
 
+    def renderTable2(self):
+        """
+        - Showing the full table instead of just the upper part above the main diagonal
+        - The values will also get colors based on their relative difference
+        """
+        if 1 == len(self.names):
+            tk.Label(master = self.frame4table, text = self.names[0], foreground = 'purple').grid(row = 0, column = 1) # top row
+            tk.Label(master = self.frame4table, text = self.names[0], foreground = 'purple').grid(row = 1, column = 0) # Leftmost column
+
+            self.entries = []
+            entry = tk.Entry(master = self.frame4table, width = 5)
+            entry.grid(row = 1, column = 1)
+            entry.insert(0, self.table[0,0])
+            self.entries.append([entry, None])
+
+        else:
+            #N = len(self.names)
+            # Create and place the Label widgets for the names
+            for i, name in enumerate(self.names):
+                tk.Label(master = self.frame4table, text = name, foreground = 'purple').grid(row = 0, column = i+1) # top row
+                tk.Label(master = self.frame4table, text = name, foreground = 'purple').grid(row = i+1, column = 0) # Leftmost column
+
+            # Create and place the Entry widgets for the matrix values (contact energies)
+            self.entries = []  # clear the old widgets
+
+            self.min_val = self.table.min()
+            self.max_val = self.table.max()
+
+            # Diagonal Entries
+            self.diag_entries = []
+            for i in range(len(self.names)):
+                row_entries = []
+                for j in range(len(self.names)):
+                    if i <= j: # Only show the upper triangular part
+                        if i == j:
+                            ###
+                            ### Need Review for optimization
+                            ###
+                            entry = tk.Entry(master = self.frame4table, width = 5)
+                            entry.grid(row = i+1, column = j+1)
+                            entry.insert(0, self.table[i,j])    # show current value
+
+                            # apply an initial color for values positive                                     
+                            if self.table[i,j] > 0:
+                                color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
+                                entry.configure(bg = color)
+
+                            self.diag_entries.append(entry) # Store the created entry for event function binding
+
+                            # bind entry with event function that dynamically change its bg color based on its value
+                            #### Pass i as a default argument to the lambda
+                            self.diag_entries[i].bind('<KeyRelease>', lambda event, idx = i: self.change_color(self.diag_entries[idx]))
+
+                            row_entries.append([entry, None])
+                        else: # i < j then create synchronized entries
+                            twin_entries = self.synced_entries(master = self.frame4table,
+                                                              compute_color_func = self.compute_color,
+                                                              min_max = (self.min_val, self.max_val),
+                                                              width = 5)
+
+                            # visually place the entries accordingly
+                            twin_entries.entry1.grid(row = i+1, column = j+1)
+                            twin_entries.entry2.grid(row = j+1, column = i+1)
+                            # Set values according to the matrix
+                            twin_entries.entry1.insert(0, self.table[i,j])
+                            twin_entries.entry2.insert(0, self.table[i,j])
+                            # apply an initial color for values positive
+                            if self.table[i,j] > 0:
+                                color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
+                                twin_entries.entry1.configure(bg = color)
+                                twin_entries.entry2.configure(bg = color)
+
+                            row_entries.append([twin_entries.entry1, twin_entries.entry2])
+                self.entries.append(row_entries)
+
+
+    def compute_color(self, value, min_val, max_val):
+        """
+        Subroutine
+        compute the color based on the value's relative position between min and max
+        """
+
+        ratio = (value - min_val) / (max_val - min_val)
+        red = int(255 * ratio)
+        green = int(255 * (1 - ratio))
+        blue = 180
+        return f'#{red:02x}{green:02x}{blue:02x}'
+
+    def change_color(self, src):
+        """
+        Event Function to change the color of entries based on their relative position between min and max in the matrix
+        """
+        value = float(src.get())
+        # update the min_max record
+        if value < self.min_val:
+            self.min_val = value
+        if value > self.max_val:
+            self.max_val = value
+        # Compute the color
+        color = self.compute_color(value, self.min_val, self.max_val)
+        src.configure(bg = color)
 
 
     def updateMatrix(self):
@@ -95,7 +197,7 @@ class EventHandler:
         for i in range(len(self.names)):
             for j in range(len(self.names)):
                 if i <= j: # Only use the upper triangular part
-                    value = self.entries[i][j - i].get()
+                    value = self.entries[i][j - i][0].get()
                     try:
                         self.table[i,j] = self.table[j,i] = float(value)
                     except ValueError:
@@ -154,7 +256,7 @@ class EventHandler:
                     else:
                         self.table = np.zeros((1,1), dtype = float)
                     # Render the matrix into table 
-                    self.renderTable()
+                    self.renderTable2()
                     break
 
 
@@ -168,4 +270,52 @@ class EventHandler:
             widget.destroy()
         self.names = []
         self.table = None
+
+    def clearFrame(self, frame):
+        """
+        Clear the frame for re-rendering
+        """
+        for widget in frame.winfo_children():
+            widget.destroy()
+
+
+
+    class synced_entries:
+        """
+        Create Two Synced Entries that Share the Same Entry Value and the Same BG Color
+        """
+        def __init__(self, master, compute_color_func, min_max, width = 5):
+            self.entry1 = tk.Entry(master = master, width = width)
+            self.entry2 = tk.Entry(master = master, width = width)
+
+            self.compute_color = compute_color_func
+            self.min_val, self.max_val = min_max
+
+            # Bind them with sync method
+            self.entry1.bind('<KeyRelease>', lambda event: self.sync(self.entry1))
+            self.entry2.bind('<KeyRelease>', lambda event: self.sync(self.entry2))
+
+        def sync(self, src):
+            """Event Function to sync the entries based on the source entry """
+            value = float(src.get())
+            # update the min_max record
+            if value < self.min_val:
+                self.min_val = value
+            if value > self.max_val:
+                self.max_val = value
+
+            color = self.compute_color(value, self.min_val, self.max_val)
+            # Change current entry's color
+            src.configure(bg = color)
+
+            if src == self.entry1:
+                self.entry2.delete(0, tk.END)
+                self.entry2.insert(0, value)
+                # change the twin entry's color
+                self.entry2.configure(bg = color)
+            else:
+                self.entry1.delete(0, tk.END)
+                self.entry1.insert(0, value)
+                # change th twin entry's color
+                self.entry1.configure(bg = color)
 

@@ -12,10 +12,14 @@ Visual Compenents and their usages (Left to Right)
         - Generate XML from Table
         - Add a New Cell
         - Clear the Table
+    - Color Bar Field:
     - Table Field:
 """
 import tkinter as tk
-from EventHandler import EventHandler
+
+
+from utils.EventHandler import EventHandler
+from visual_components.ColorBar import ColorBar
 
 """
 # Base window
@@ -28,7 +32,8 @@ window.title("Simple XML2Table Editor")
 window.rowconfigure(0, minsize = 200, weight = 1)
 window.columnconfigure(0, minsize = 100, weight = 1)
 window.columnconfigure(1, minsize = 150, weight = 1)
-window.columnconfigure(2, minsize = 100, weight = 1)
+window.columnconfigure(2, minsize = 25, weight = 1)
+window.columnconfigure(3, minsize = 100, weight = 1)
 
 # ====================================== #
 
@@ -42,6 +47,8 @@ window.columnconfigure(2, minsize = 100, weight = 1)
 frame_txtField = tk.Frame(master = window, width = 60, height = 200)
 
 frame_buttons = tk.Frame(master = window, relief = tk.RAISED, bd = 2, width = 20, height = 200)
+
+frame_CB = tk.Frame(master = window, width = 30, height = 200)
 
 frame_table = tk.Frame(master = window, width = 100, height = 200)
 
@@ -57,7 +64,8 @@ frame_table = tk.Frame(master = window, width = 100, height = 200)
 
 frame_txtField.grid(row = 0, column = 0, sticky = 'nsew')
 frame_buttons.grid(row = 0, column = 1, sticky = 'ns')
-frame_table.grid(row = 0, column = 2, sticky = 'nsew')
+frame_CB.grid(row = 0, column = 2, sticky = 'ns')
+frame_table.grid(row = 0, column = 3, sticky = 'nsew')
 
 # ====================================== #
 
@@ -109,6 +117,17 @@ btn_xml2table.grid(row = 0, column = 0, sticky = 'ew', padx = 5, pady = 5)
 btn_table2xml.grid(row = 1, column = 0, sticky = 'ew', padx = 5, pady = 5)
 btn_newCell.grid(row = 2, column = 0, sticky = 'ew', padx = 5, pady = 5)
 btn_clear.grid(row = 3, column = 0, sticky = 'ew', padx = 5, pady = 5)
+
+
+# ====================================== #
+
+
+"""
+Color Bar
+200 x 25
+"""
+color_bar = ColorBar(root = frame_CB, compute_color_func = e_handler.compute_color,
+                    W = 25, H = 200)
 
 
 # ====================================== #
