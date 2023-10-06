@@ -27,7 +27,7 @@ Then each button literally does what it says.
 - The color dynamically assigned to each entry is determined based on its relative position with respect to the min_max values imported from XML
 
 ### Example Image of the Widget
-<img src="./images/example_v02.png">
+<img src="./images/example_v02_1.png">
 
 
 ### Major Issues:                                                                                            

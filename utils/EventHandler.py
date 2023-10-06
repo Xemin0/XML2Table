@@ -53,8 +53,8 @@ class EventHandler:
 
     def renderTable(self):
         """
-        Subroutine
-        render the Table based on self.names and self.table
+        Subroutine for v01
+        render the Table based on self.names and self.table as an upper-triangular one
         """
         # primarily using the .grid method
 
@@ -88,8 +88,10 @@ class EventHandler:
 
     def renderTable2(self):
         """
+        Subroutine for v02
         - Showing the full table instead of just the upper part above the main diagonal
         - The values will also get colors based on their relative difference
+        - Symmetric Entries are now dynamically synced
         """
         if 1 == len(self.names):
             tk.Label(master = self.frame4table, text = self.names[0], foreground = 'purple').grid(row = 0, column = 1) # top row
@@ -129,9 +131,9 @@ class EventHandler:
                             entry.insert(0, self.table[i,j])    # show current value
 
                             # apply an initial color for values positive                                     
-                            if self.table[i,j] > 0:
-                                color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
-                                entry.configure(bg = color)
+                            #if self.table[i,j] > 0: # Excluding non-positive values
+                            color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
+                            entry.configure(bg = color)
 
                             self.diag_entries.append(entry) # Store the created entry for event function binding
 
@@ -153,10 +155,10 @@ class EventHandler:
                             twin_entries.entry1.insert(0, self.table[i,j])
                             twin_entries.entry2.insert(0, self.table[i,j])
                             # apply an initial color for values positive
-                            if self.table[i,j] > 0:
-                                color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
-                                twin_entries.entry1.configure(bg = color)
-                                twin_entries.entry2.configure(bg = color)
+                            #if self.table[i,j] > 0: # whether excluding non-positive values
+                            color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
+                            twin_entries.entry1.configure(bg = color)
+                            twin_entries.entry2.configure(bg = color)
 
                             row_entries.append([twin_entries.entry1, twin_entries.entry2])
                 self.entries.append(row_entries)

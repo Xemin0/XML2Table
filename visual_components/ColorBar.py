@@ -26,12 +26,15 @@ class ColorBar:
         step_height = self.H / num_steps
 
         for i in range(num_steps):
-            value =  min_val + (max_val - min_val) * ( (i+0.0) / num_steps)
+            # starting from top-min to bottom-max
+            #value =  min_val + (max_val - min_val) * ( (i+0.0) / num_steps)
+            # starting from top-max to bottom-min
+            value =  max_val - (min_val + (max_val - min_val) * ( (i+0.0) / num_steps))
             color = self.compute_color(value, min_val, max_val)
             self.canvas.create_rectangle(0, i*step_height, self.W, (i+1)*step_height, fill = color, outline = color)
 
-        self.canvas.create_text(int(self.W / 2) + 2, 0, text = 'min', anchor = 'n')
-        self.canvas.create_text(int(self.W / 2) + 2, self.H, text = 'max', anchor = 's')
+        self.canvas.create_text(int(self.W / 2) + 2, 0, text = 'max', anchor = 'n')
+        self.canvas.create_text(int(self.W / 2) + 2, self.H, text = 'min', anchor = 's')
 
 """
 Test
