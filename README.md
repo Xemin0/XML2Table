@@ -23,7 +23,7 @@ Either:
 Then each button literally does what it says.
 
 ### Major Features
-- The values and the background colors of symmetric entry pairs will be dynamically synchronized.
+- The values and the background colors of symmetric entry pairs are dynamically synchronized.
 - The color dynamically assigned to each entry is determined based on its relative position with respect to the min_max values imported from XML
 
 ### Example Image of the Widget
