@@ -15,6 +15,8 @@
 #### Interactive Logic
 - The colors computed are not equally spaced in terms of the relative value between $[0,1]$
 
+#### Code Optimizaiton
+- `utils/EventHandler.py` needs to be optimized
 
 
 
