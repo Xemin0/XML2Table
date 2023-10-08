@@ -24,17 +24,13 @@ Then each button literally does what it says.
 
 ### Major Features
 - The values and the background colors of symmetric entry pairs are dynamically synchronized.
+- The whole table's colors are updated for each change in any entry value
 - The color dynamically assigned to each entry is determined based on its relative position with respect to the min_max values imported from XML
 
 ### Example Image of the Widget
-<img src="./images/example_v02_1.png">
+<img src="./images/example_v02_2.png">
 
 
 ### Major Issues:                                                                                            
-#### Interactive Logic
-- The color dynamically assigned is still based on the initial min_max pair
-- Entering a new value in an entry does not change the value stored
-- Thus, entering a new value only changes the exact synced entry pair, but other entries are not updated accordingly.
 - The colors are not equally spaced (as in the color bar)
 
-**A workaround is to use the `Convert to XML` button to recollect the values altogether, then `Convert to Table` to color the entries again as a whole.**

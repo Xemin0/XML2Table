@@ -1,8 +1,6 @@
-### v02
-- Included the whole (symmetric) matrix in the table; 
-- Symmetric entries are now dynamically synchronized (both the values and the background color)
-- Colored the Entry cells based on the relative values
-- Added a static color bar indicating the color range
+### v02_2
+- Some visual improvments
+- Now the whole table will be recolored based on the current entry's value changes
 
 
 ### Future Features:
@@ -16,11 +14,7 @@
 
 #### Interactive Logic
 - The colors computed are not equally spaced in terms of the relative value between $[0,1]$
-- The color dynamically assigned is still based on the initial min_max pair
-- Entering a new value in an entry does not change the value stored
-- Thus, entering a new value only changes the exact synced entry pair, but not other entries.
 
-A workaround is to use the `Convert to XML` button to recollect the values altogether, then `Convert to Table` to color the entries again as a whole.
 
 
 
@@ -29,6 +23,12 @@ A workaround is to use the `Convert to XML` button to recollect the values altog
 
 ----
 ## Dated
+
+### v02
+- Included the whole (symmetric) matrix in the table; 
+- Symmetric entries are now dynamically synchronized (both the values and the background color)
+- Colored the Entry cells based on the relative values
+- Added a static color bar indicating the color range
 
 ### v01
 - The initial version with a Text Field, several buttons, and a region to create table of entries based on the XML copy-pasted in.

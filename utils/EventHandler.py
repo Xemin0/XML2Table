@@ -144,13 +144,14 @@ class EventHandler:
 
                             # bind entry with event function that dynamically change its bg color based on its value
                             #### Pass i as a default argument to the lambda
-                            self.diag_entries[i].bind('<KeyRelease>', lambda event, idx = i: self.change_color(self.diag_entries[idx]))
+                            self.diag_entries[i].bind('<KeyRelease>', lambda event, idx = i: self.change_color(self.diag_entries[idx], (idx,idx)))
 
                             row_entries.append([entry, None])
                         else: # i < j then create synchronized entries
                             twin_entries = self.synced_entries(master = self.frame4table,
                                                               compute_color_func = self.compute_color,
-                                                              min_max = (self.min_val, self.max_val),
+                                                              table = self.table, # numpy object passed by reference
+                                                              indices = (i, j),
                                                               width = 5)
 
                             # visually place the entries accordingly
@@ -170,7 +171,21 @@ class EventHandler:
                             twin_entries.entry2.configure(foreground = "black")
 
                             row_entries.append([twin_entries.entry1, twin_entries.entry2])
+
+                            ## Bind Color Changing Event function to the synced entries
+                            #self.entries[i][j-i][0].bind('<KeyRelease>', lambda event, indices = (i, j): self.change_color(self.entries[i][j-i][0], indices))
+                            #self.entries[i][j-i][1].bind('<KeyRelease>', lambda event, indices = (j, i): self.change_color(self.entries[i][j-i][1], indices))
+
                 self.entries.append(row_entries)
+
+
+            for i in range(len(self.names)):
+                for j in range(len(self.names)):
+                    if i < j:
+                        ## Bind Color Changing Event function to the synced entries
+                        self.entries[i][j-i][0].bind('<KeyRelease>', lambda event, idi = i, idj = j: self.change_color(self.entries[idi][idj - idi][0], (idi, idj)))
+                        self.entries[i][j-i][1].bind('<KeyRelease>', lambda event, idi = i, idj = j: self.change_color(self.entries[idi][idj - idi][1], (idi, idj))) # Still pass in (i, j) for simple downstream value-syncing operation
+
 
 
     def compute_color(self, value, min_val, max_val):
@@ -179,25 +194,74 @@ class EventHandler:
         compute the color based on the value's relative position between min and max
         """
 
-        ratio = (value - min_val) / (max_val - min_val)
+        # max_val != min_val
+        if min_val == max_val:
+            ratio = 0
+        else:
+            ratio = (value - min_val) / (max_val - min_val)
         red = int(255 * ratio)
         green = int(255 * (1 - ratio))
         blue = 180
         return f'#{red:02x}{green:02x}{blue:02x}'
 
-    def change_color(self, src):
+    def change_color(self, src, indices):
         """
         Event Function to change the color of entries based on their relative position between min and max in the matrix
+            - Update Entry Value
+            - Update min_max Record
+            - Change Entry Pair Colors
+            - ** Update the color for the whole table
         """
         value = float(src.get())
         # update the min_max record
-        if value < self.min_val:
-            self.min_val = value
-        if value > self.max_val:
-            self.max_val = value
+        #if value < self.min_val:
+        #    self.min_val = value
+        #if value > self.max_val:
+        #    self.max_val = value
+        # update the table 
+        i, j = indices
+        #print(" i = ", i)
+        #print(" j = ", j)
+        self.table[i, j] = self.table[j, i] = value
+        self.min_val, self.max_val = self.table.min(), self.table.max()
+
+        # Syncing Values
+        ##
+        ## ** A better way would be passing the synced_entries object in, instead of passing in them as a list
+        if i != j: # Then i < j is assumed
+            entry1 = self.entries[i][j-i][0]
+            entry2 = self.entries[i][j-i][1]
+            if src == entry1:
+                entry2.delete(0, tk.END)
+                entry2.insert(0, value)
+            else:
+                entry1.delete(0, tk.END)
+                entry1.insert(0, value)
+
         # Compute the color
-        color = self.compute_color(value, self.min_val, self.max_val)
-        src.configure(bg = color)
+        #color = self.compute_color(value, self.min_val, self.max_val)
+        #src.configure(bg = color)
+        #print("updated_table = \n", self.table)
+        # Color the whole table
+        self.color_whole_table()
+
+
+    def color_whole_table(self):
+        """
+        Subroutine
+        Color the whole table of entries based on current matrix values
+        """
+        N = len(self.names)
+        #self.min_val, self.max_val = self.table.min(), self.table.max()
+        for i in range(N):
+            for j in range(N):
+                if i <= j:
+                    color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
+                    entry1, entry2 = self.entries[i][j-i]
+                    # Set the color for both entries
+                    entry1.configure(bg = color)
+                    if entry2 is not None:
+                        entry2.configure(bg = color)
 
 
     def updateMatrix(self):
@@ -294,39 +358,49 @@ class EventHandler:
     class synced_entries:
         """
         Create Two Synced Entries that Share the Same Entry Value and the Same BG Color
+        *** Consider inherit from tk.Entry ***
         """
-        def __init__(self, master, compute_color_func, min_max, width = 5):
+        def __init__(self, master, compute_color_func, table, indices, width = 5):
             self.entry1 = tk.Entry(master = master, width = width)
             self.entry2 = tk.Entry(master = master, width = width)
 
             self.compute_color = compute_color_func
-            self.min_val, self.max_val = min_max
+            # Original matrix
+            self.table = table
+            self.min_val, self.max_val = self.table.min(), self.table.max()
+            # entry position inside the matrix
+            self.i, self.j = indices
 
             # Bind them with sync method
-            self.entry1.bind('<KeyRelease>', lambda event: self.sync(self.entry1))
-            self.entry2.bind('<KeyRelease>', lambda event: self.sync(self.entry2))
+            #self.entry1.bind('<KeyRelease>', lambda event: self.sync(self.entry1))
+            #self.entry2.bind('<KeyRelease>', lambda event: self.sync(self.entry2))
 
         def sync(self, src):
             """Event Function to sync the entries based on the source entry """
             value = float(src.get())
             # update the min_max record
-            if value < self.min_val:
-                self.min_val = value
-            if value > self.max_val:
-                self.max_val = value
+            #if value < self.min_val:
+            #    self.min_val = value
+            #if value > self.max_val:
+            #    self.max_val = value
+            # update the table entry pair
+            #self.table[self.i, self.j] = self.table[self.j, self.i] = value
+            #self.min_val, self.max_val = self.table.min(), self.table.max()
 
-            color = self.compute_color(value, self.min_val, self.max_val)
+
+            #### The coloring part will be handled as an extra event function in the outter class
+            ####
+            #color = self.compute_color(value, self.min_val, self.max_val)
             # Change current entry's color
-            src.configure(bg = color)
+            #src.configure(bg = color)
 
             if src == self.entry1:
                 self.entry2.delete(0, tk.END)
                 self.entry2.insert(0, value)
                 # change the twin entry's color
-                self.entry2.configure(bg = color)
+                #self.entry2.configure(bg = color)
             else:
                 self.entry1.delete(0, tk.END)
                 self.entry1.insert(0, value)
                 # change th twin entry's color
-                self.entry1.configure(bg = color)
-
+                #self.entry1.configure(bg = color)
