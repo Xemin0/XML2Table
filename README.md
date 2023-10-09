@@ -34,3 +34,6 @@ Then each button literally does what it says.
 ### Major Issues:                                                                                            
 - The colors are not equally spaced (as in the color bar)
 
+
+### License
+[BSD-3-Clause License](./LICENSE)
