@@ -94,8 +94,8 @@ class EventHandler:
         - Symmetric Entries are now dynamically synced
         """
         if 1 == len(self.names):
-            tk.Label(master = self.frame4table, text = self.names[0], foreground = 'purple').grid(row = 0, column = 1) # top row
-            tk.Label(master = self.frame4table, text = self.names[0], foreground = 'purple').grid(row = 1, column = 0) # Leftmost column
+            tk.Label(master = self.frame4table, text = self.names[0]).grid(row = 0, column = 1) # top row
+            tk.Label(master = self.frame4table, text = self.names[0]).grid(row = 1, column = 0) # Leftmost column
 
             self.entries = []
             entry = tk.Entry(master = self.frame4table, width = 5)
@@ -110,8 +110,8 @@ class EventHandler:
             #N = len(self.names)
             # Create and place the Label widgets for the names
             for i, name in enumerate(self.names):
-                tk.Label(master = self.frame4table, text = name, foreground = 'purple').grid(row = 0, column = i+1) # top row
-                tk.Label(master = self.frame4table, text = name, foreground = 'purple').grid(row = i+1, column = 0) # Leftmost column
+                tk.Label(master = self.frame4table, text = name).grid(row = 0, column = i+1) # top row
+                tk.Label(master = self.frame4table, text = name).grid(row = i+1, column = 0) # Leftmost column
 
             # Create and place the Entry widgets for the matrix values (contact energies)
             self.entries = []  # clear the old widgets

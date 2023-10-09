@@ -1,0 +1,26 @@
+{% set data = load_setup_py_data() %}
+package:
+    name: xml2table
+    version: {{ data['version'] }}
+
+source:
+    path: ..
+
+build:
+    script: python3 setup.py install
+
+requirements:
+    build:
+        - python >=3.6,{{PY_VER}}*
+        - setuptools <60.0
+    run:
+        - python {{PY_VER}}*
+        - numpy >=1.8*
+
+about:
+    home: https://github.com/Xemin0/XML2Table
+    license: BSD 3-Clause
+    license_file: LICENSE
+    license_family: BSD
+
+    summary: data['description']

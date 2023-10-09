@@ -6,14 +6,29 @@ It simply converts between the copy-pasted XML contents and a visual table. XML 
 *Could be adapted for other parameter-settings in XML.*
 
 ### Required Python Packages
-- Python 3.10.12 (Other python should also work)
-- `TkInter`
+- Python 3.10.12 (Other python should also work; and `TkInter` used is already an integral part of `Python`)
 - `Numpy`
 
-### How to Use it
-- Start the program by running 
+
+### Install
+- `conda` 
 ```bash
-python xml2table_v{current_version_number}.py
+conda install -c xemin0 xml2table
+```
+- Directly clone the repo
+```bash
+git clone https://github.com/Xemin0/XML2Table
+```
+
+
+### How to Use it
+#### Installed from `conda`
+simply run `xml2table` from command line
+
+#### Cloned from Github 
+Navigate to `xml2table/` folder then start the program by running 
+```bash
+python xml2table.py
 ```
 
 Either:
