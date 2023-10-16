@@ -1,10 +1,18 @@
 {% set data = load_setup_py_data() %}
 package:
     name: xml2table
-    version: {{ data['version'] }}
+    version: "{{ environ['GIT_DESCRIBE_TAG'] }}"
 
 source:
     path: ..
+
+channels:
+    - conda-forge
+    - default
+
+dependencies:
+    - anaconda-client
+    - conda-build
 
 build:
     script: python3 setup.py install
