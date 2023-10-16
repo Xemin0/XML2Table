@@ -8,13 +8,13 @@ on:
 
 jobs:
     publish:
-        runs-on: MacOS-latest
+        runs-on: Ubuntu-latest
         steps:
         - name: Checkout Code
-          uses: actions/checkout@v2
+          uses: actions/checkout@v1
 
         - name: publish-to-conda
-          uses: MichaelsJP/conda-package-publish-action@v1.0.0
+          uses: MichaelsJP/conda-package-publish-action@v1.1.0
           with:
             subDir: './conda-recipe'
             AnacondaToken: ${{ secrets.ANACONDA_TOKEN }}
