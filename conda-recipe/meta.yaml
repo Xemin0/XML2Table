@@ -11,10 +11,10 @@ build:
 
 requirements:
     build:
-        - python >=3.9,{{PY_VER}}*
+        - python >=3.8, {{PY_VER}}*
         - setuptools <60.0
     run:
-        - python >=3.9, {{PY_VER}}*
+        - python >=3.8, {{PY_VER}}*
         - numpy >=1.8*
 
 about:
