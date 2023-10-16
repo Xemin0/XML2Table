@@ -40,7 +40,7 @@ Then each button literally does what it says.
 ### Major Features
 - The values and the background colors of symmetric entry pairs are dynamically synchronized.
 - The whole table's colors are updated for each change in any entry value
-- The color dynamically assigned to each entry is determined based on its relative position with respect to the min_max values imported from XML
+- The color dynamically assigned to each entry is determined based on its relative position with respect to the min_max values of the current table
 
 ### Example Image of the Widget
 <img src="./images/example_v02_2.png">
