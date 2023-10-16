@@ -2,7 +2,7 @@ name: build_and_publish_conda
 
 on:
     release:
-    types: 
+      types: 
         - published
 
 
