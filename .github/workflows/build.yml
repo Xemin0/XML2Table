@@ -32,10 +32,10 @@ jobs:
           with:
             meta_yaml_dir: ./conda-recipe
             python-version: ${{ matrix.python-version }}
-            platform_linux-64: true
-            platform_osx-64: true
-            platform_win-64: true
-            platform_osx-arm64: true
+            #platform_linux-64: true
+            #platform_osx-64: true
+            #platform_win-64: true
+            #platform_osx-arm64: true
             user: xemin0
             label: auto
             overwrite: true
