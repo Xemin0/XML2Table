@@ -11,7 +11,7 @@ It simply converts between the copy-pasted XML contents and a visual table. XML 
 
 
 ### Install
-- `conda` 
+- `conda` (currently only support python>=3.10)
 ```bash
 conda install -c xemin0 xml2table
 ```

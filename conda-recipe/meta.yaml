@@ -6,23 +6,15 @@ package:
 source:
     path: ..
 
-channels:
-    - conda-forge
-    - default
-
-dependencies:
-    - anaconda-client
-    - conda-build
-
 build:
     script: python3 setup.py install
 
 requirements:
     build:
-        - python >=3.9
+        - python >=3.8
         - setuptools <60.0
     run:
-        - python >=3.9
+        - python >=3.8
         - numpy >=1.8*
 
 about:
