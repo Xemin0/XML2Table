@@ -19,3 +19,7 @@ jobs:
           with:
             subDir: './conda-recipe'
             AnacondaToken: ${{ secrets.ANACONDA_TOKEN }}
+
+        - name: upload to Anaconda cloud
+          run: |
+            anaconda -t ${{ secrets.ANACONDA_TOKEN }} upload -u xemin0 ./linux-64/xml2table-v0.2.2-py311_0.tar.bz2
