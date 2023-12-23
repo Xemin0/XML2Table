@@ -1,4 +1,4 @@
-# XML2Table
+# XML2Table (TkInter Version)
 A demo python GUI widget meant to facilate the parameter-settings (Contact Energies) in [CompCell3D](https://compucell3d.org/) [Git Page](https://github.com/CompuCell3D/CompuCell3D) using `TkInter`
 
 It simply converts between the copy-pasted XML contents and a visual table. XML parsing is done using regular expressions. 
