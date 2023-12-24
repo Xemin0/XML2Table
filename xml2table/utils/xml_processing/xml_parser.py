@@ -37,7 +37,7 @@ def getNames(xml):
     for line in xml.split('\n'):
        str_list = line.split('"')
        names += [str_list[1]] + [str_list[3]]
-    return set(names)
+    return set(names) ### Does not preseve the ordering
 
 def names_and_values(xml):
     """
@@ -80,6 +80,7 @@ def names_and_values(xml):
 
             edges.append([value, name1, name2])
 
+    ##### !! Does not preserve the ordering !! ####
     unique_names = list(set(t[1] for t in edges) | set(t[2] for t in edges))
     # Re-arrange to make 'Medium' the default type to be the first, if included
     if 'Medium' in unique_names:

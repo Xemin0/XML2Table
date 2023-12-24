@@ -43,7 +43,7 @@ class XML2Table(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Simple XML2Table Editor")
-        self.setMinimumSize(400, 300) # Set a minimum size for the window
+        self.setMinimumSize(400, 320) # Set a minimum size for the window
 
         # ====================================== #
         # Main widget and a horizonatl layout for the major components
@@ -74,24 +74,25 @@ class XML2Table(QMainWindow):
         self.buttonsLayout.setContentsMargins(5, 5, 5, 5) # left, top, right, bottom
         # ====================================== #
         # Create EventHandler Instance
-        #self.e_handler = EventHandler(self.text_box)
+        self.tableLayout = QVBoxLayout()
+        self.e_handler = EventHandler(self.text_box, self.tableLayout)
 
         # ====================================== #
         # Define buttons and add to layout
         self.btn_xml2table = QPushButton('Convert to Table', self)
-        #self.btn_xml2table.clicked.connect(self.e_handler.toTable)
+        self.btn_xml2table.clicked.connect(self.e_handler.toTable)
         self.buttonsLayout.addWidget(self.btn_xml2table)
 
         self.btn_table2xml = QPushButton('Convert to XML', self)
-        #self.btn_table2xml.clicked.connect(self.e_handler.toXML)
+        self.btn_table2xml.clicked.connect(self.e_handler.toXML)
         self.buttonsLayout.addWidget(self.btn_table2xml)
 
         self.btn_newCell = QPushButton('Add New Cell', self)
-        #self.btn_newCell.clicked.connect(self.e_handler.newCell)
+        self.btn_newCell.clicked.connect(self.e_handler.newCell)
         self.buttonsLayout.addWidget(self.btn_newCell)
 
         self.btn_clear = QPushButton('Clear Table', self)
-        #self.btn_clear.clicked.connect(self.e_handler.clearTable)
+        self.btn_clear.clicked.connect(self.e_handler.clearTable)
         self.buttonsLayout.addWidget(self.btn_clear)
 
         # Add a Space at the bottom to push the buttons up (top-aligned)
@@ -100,13 +101,15 @@ class XML2Table(QMainWindow):
 
         # ====================================== #
         # Color Bar
-        #self.color_bar = ColorBar(root = self, compute_color_func = self.e_handler.compute_color, W = 25, H = 200)
-        #self.mainLayout.addWidget(self.color_bar)
+        self.color_bar = ColorBar(parent = self, compute_color_func = self.e_handler.compute_color, W = 25, H = 200)
+        self.mainLayout.addWidget(self.color_bar)
 
 
         # ====================================== #
         # Table Field 
         # (Not initialized by default until the corresponding button is clicked)
+        self.mainLayout.addLayout(self.tableLayout)
+
 
 if __name__ == "__main__":
     main()

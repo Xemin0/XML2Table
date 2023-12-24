@@ -1,6 +1,8 @@
-import tkinter as tk
 import numpy as np
-from tkinter import simpledialog, messagebox
+from PyQt5.QtWidgets import QMessageBox, QVBoxLayout, QInputDialog
+from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem, QColorDialog
+from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtCore import Qt
 
 from .xml_processing.xml_parser import names_and_values
 
@@ -11,11 +13,9 @@ from .xml_processing.xml_parser import names_and_values
 """
 
 class EventHandler:
-    def __init__(self, text_field, frame4table, *args):
-        self.text_field = text_field    # Text Field to extract the raw XML from
-        self.frame4table = frame4table  # The frame to render the editable table
-        self.entries = []               # references to Entry widgets created
-
+    def __init__(self, text_box, frame4table, *args):
+        self.text_field = text_box    # QTextEdit to extract the raw XML from
+        self.frame4table = frame4table # The Layout to render the editable table 
 
         self.rawXML = None          # Raw XML string extracted
         self.xml_format = ['''<Energy Type1="''',
@@ -45,46 +45,30 @@ class EventHandler:
         *** Table is currently implemented as grids of Labels and Entrys ***
         """
         # Get the Raw XML from the text box
-        self.rawXML = self.text_field.get("1.0", tk.END) # Line number starts at 1
-                                                         # Char count starts at 0
-        self.names, self.table = names_and_values(self.rawXML)
-        # Create the table and render it inside the corresponding frame
-        self.renderTable2()
+        self.rawXML = self.text_field.toPlainText()
+        if self.rawXML:
+            self.names, self.table = names_and_values(self.rawXML)
+            # Create the table and render it inside the corresponding frame
+            self.renderTable2()
 
-    def renderTable(self):
-        """
-        Subroutine for v01
-        render the Table based on self.names and self.table as an upper-triangular one
-        """
-        # primarily using the .grid method
 
-        if 1 == len(self.names):
-            tk.Label(master = self.frame4table, text = self.names[0], foreground = 'purple').grid(row = 0, column = 1) # top row
-            tk.Label(master = self.frame4table, text = self.names[0], foreground = 'purple').grid(row = 1, column = 0) # Leftmost column
+    def adjustTableSize(self):
+        '''
+        Set the size for each table cell
+        Then set the minimum size of the resulting table
+        '''
+        cellW = 50
+        cellH = 30
 
-            self.entries = []
-            entry = tk.Entry(master = self.frame4table, width = 5)
-            entry.grid(row = 1, column = 1)
-            entry.insert(0, self.table[0,0])
-            self.entries.append([entry])
+        for i in range(self.tableWidget.rowCount()):
+            self.tableWidget.setRowHeight(i, cellH)
+        for j in range(self.tableWidget.columnCount()):
+            self.tableWidget.setColumnWidth(j, cellW)
 
-        else:
-            # Create and place the Label widgets for the names
-            for i, name in enumerate(self.names):
-                tk.Label(master = self.frame4table, text = name, foreground = 'purple').grid(row = 0, column = i+1) # top row
-                tk.Label(master = self.frame4table, text = name, foreground = 'purple').grid(row = i+1, column = 0) # Leftmost column
+        totalW = self.tableWidget.columnCount() * cellW
+        totalH = self.tableWidget.rowCount() * cellH
 
-            # Create and place the Entry widgets for the matrix values (contact energies)
-            self.entries = []  # clear the old widgets
-            for i in range(len(self.names)):
-                row_entries = []
-                for j in range(len(self.names)):
-                    if i <= j: # Only show the upper triangular part
-                        entry = tk.Entry(master = self.frame4table, width = 5)
-                        entry.grid(row = i+1, column = j+1) # location inside the frame
-                        entry.insert(0, self.table[i,j])    # show current value
-                        row_entries.append(entry)
-                self.entries.append(row_entries)
+        self.tableWidget.setMinimumSize(totalW, totalH)
 
     def renderTable2(self):
         """
@@ -93,98 +77,67 @@ class EventHandler:
         - The values will also get colors based on their relative difference
         - Symmetric Entries are now dynamically synced
         """
-        if 1 == len(self.names):
-            tk.Label(master = self.frame4table, text = self.names[0]).grid(row = 0, column = 1) # top row
-            tk.Label(master = self.frame4table, text = self.names[0]).grid(row = 1, column = 0) # Leftmost column
+        # Font
+        font = QFont()
+        font.setPointSize(15)
+        # Initialize the table with labels
+        self.tableWidget = QTableWidget(len(self.names), len(self.names))
 
-            self.entries = []
-            entry = tk.Entry(master = self.frame4table, width = 5)
-            entry.grid(row = 1, column = 1)
-            entry.insert(0, self.table[0,0])
-            # set the initial color ???
-            #color = self.compute_color(self.table[0,0], )
-            self.entries.append([entry, None])
+        self.tableWidget.setHorizontalHeaderLabels(self.names)
+        self.tableWidget.horizontalHeader().setFont(font)
 
+        self.tableWidget.setVerticalHeaderLabels(self.names)
+        self.tableWidget.verticalHeader().setFont(font)
 
+        if self.table is None:
+            self.min_val, self.max_val = 0, 0
         else:
-            #N = len(self.names)
-            # Create and place the Label widgets for the names
-            for i, name in enumerate(self.names):
-                tk.Label(master = self.frame4table, text = name).grid(row = 0, column = i+1) # top row
-                tk.Label(master = self.frame4table, text = name).grid(row = i+1, column = 0) # Leftmost column
+            self.min_val, self.max_val = self.table.min(), self.table.max()
 
-            # Create and place the Entry widgets for the matrix values (contact energies)
-            self.entries = []  # clear the old widgets
+        # Populate the table
+        for i in range(len(self.names)):
+            for j in range(len(self.names)):
+                item = QTableWidgetItem(str(self.table[i,j]))
+                self.tableWidget.setItem(i, j , item)
+                # Set initial color
+                color = self.compute_color(self.table[i, j], self.min_val, self.max_val)
+                item.setBackground(QColor(color))
 
-            self.min_val = self.table.min()
-            self.max_val = self.table.max()
+                #self.tableWidget.item(i, j).setData(Qt.UserRole, (i, j)) # Keep a record of the indices for current item
 
-            # Diagonal Entries
-            self.diag_entries = []
-            for i in range(len(self.names)):
-                row_entries = []
-                for j in range(len(self.names)):
-                    if i <= j: # Only show the upper triangular part
-                        if i == j:
-                            ###
-                            ### Need Review for optimization
-                            ###
-                            entry = tk.Entry(master = self.frame4table, width = 5)
-                            entry.grid(row = i+1, column = j+1)
-                            entry.insert(0, self.table[i,j])    # show current value
+        # Connect cell editing signal to color change and synchronization functions
+        self.tableWidget.cellChanged.connect(self.onCellChanged)
 
-                            # apply an initial color for values positive                                     
-                            #if self.table[i,j] > 0: # Excluding non-positive values
-                            color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
-                            entry.configure(bg = color)
-                            # if the color range of the bg is light, need to set the text color to black
-                            entry.configure(foreground = "black")
+        # Adjust the size of table cells
+        self.adjustTableSize()
+        # clear the frame4table sublayout if it already has widgets
+        self.clearLayout(self.frame4table)
+        self.frame4table.addWidget(self.tableWidget) # Add table to the sublayout
 
-                            self.diag_entries.append(entry) # Store the created entry for event function binding
+    def onCellChanged(self, row, column):
+        # Get the new value from the edited cell 
+        #### Use a QMessageBox to handle the exception
+        try:
+            text = self.tableWidget.item(row, column).text()
+            new_val = float(text)
 
-                            # bind entry with event function that dynamically change its bg color based on its value
-                            #### Pass i as a default argument to the lambda
-                            self.diag_entries[i].bind('<KeyRelease>', lambda event, idx = i: self.change_color(self.diag_entries[idx], (idx,idx)))
+            print('The update matrix is:\n', self.table)
 
-                            row_entries.append([entry, None])
-                        else: # i < j then create synchronized entries
-                            twin_entries = self.synced_entries(master = self.frame4table,
-                                                              compute_color_func = self.compute_color,
-                                                              table = self.table, # numpy object passed by reference
-                                                              indices = (i, j),
-                                                              width = 5)
+            # 1. Update the symmetric cell
+            self.tableWidget.blockSignals(True)
+            symmetric_item = self.tableWidget.item(column, row)
+            if symmetric_item:
+                symmetric_item.setText(str(new_val))
+            self.tableWidget.blockSignals(False)
 
-                            # visually place the entries accordingly
-                            twin_entries.entry1.grid(row = i+1, column = j+1)
-                            twin_entries.entry2.grid(row = j+1, column = i+1)
-                            # Set values according to the matrix
-                            twin_entries.entry1.insert(0, self.table[i,j])
-                            twin_entries.entry2.insert(0, self.table[i,j])
-                            # apply an initial color for values positive
-                            #if self.table[i,j] > 0: # whether excluding non-positive values
-                            color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
-                            twin_entries.entry1.configure(bg = color)
-                            twin_entries.entry2.configure(bg = color)
+            # 2. Update the data matrix
+            self.table[row, column] = new_val
+            self.table[column, row] = new_val
 
-                            # if the color range of the bg is light, need to set the text color to black
-                            twin_entries.entry1.configure(foreground = "black")
-                            twin_entries.entry2.configure(foreground = "black")
-
-                            row_entries.append([twin_entries.entry1, twin_entries.entry2])
-
-                            ## Bind Color Changing Event function to the synced entries
-                            #self.entries[i][j-i][0].bind('<KeyRelease>', lambda event, indices = (i, j): self.change_color(self.entries[i][j-i][0], indices))
-                            #self.entries[i][j-i][1].bind('<KeyRelease>', lambda event, indices = (j, i): self.change_color(self.entries[i][j-i][1], indices))
-
-                self.entries.append(row_entries)
-
-
-            for i in range(len(self.names)):
-                for j in range(len(self.names)):
-                    if i < j:
-                        ## Bind Color Changing Event function to the synced entries
-                        self.entries[i][j-i][0].bind('<KeyRelease>', lambda event, idi = i, idj = j: self.change_color(self.entries[idi][idj - idi][0], (idi, idj)))
-                        self.entries[i][j-i][1].bind('<KeyRelease>', lambda event, idi = i, idj = j: self.change_color(self.entries[idi][idj - idi][1], (idi, idj))) # Still pass in (i, j) for simple downstream value-syncing operation
+            # 3. Recalculate and apply colors
+            self.recolorTable()
+        except ValueError:
+            print(f"Invalid value at row {row + 1}, column {column + 1}: {text}")
 
 
 
@@ -204,7 +157,7 @@ class EventHandler:
         blue = 180
         return f'#{red:02x}{green:02x}{blue:02x}'
 
-    def change_color(self, src, indices):
+    def recolorTable(self):
         """
         Event Function to change the color of entries based on their relative position between min and max in the matrix
             - Update Entry Value
@@ -212,57 +165,13 @@ class EventHandler:
             - Change Entry Pair Colors
             - ** Update the color for the whole table
         """
-        value = float(src.get())
-        # update the min_max record
-        #if value < self.min_val:
-        #    self.min_val = value
-        #if value > self.max_val:
-        #    self.max_val = value
-        # update the table 
-        i, j = indices
-        #print(" i = ", i)
-        #print(" j = ", j)
-        self.table[i, j] = self.table[j, i] = value
         self.min_val, self.max_val = self.table.min(), self.table.max()
-
-        # Syncing Values
-        ##
-        ## ** A better way would be passing the synced_entries object in, instead of passing in them as a list
-        if i != j: # Then i < j is assumed
-            entry1 = self.entries[i][j-i][0]
-            entry2 = self.entries[i][j-i][1]
-            if src == entry1:
-                entry2.delete(0, tk.END)
-                entry2.insert(0, value)
-            else:
-                entry1.delete(0, tk.END)
-                entry1.insert(0, value)
-
-        # Compute the color
-        #color = self.compute_color(value, self.min_val, self.max_val)
-        #src.configure(bg = color)
-        #print("updated_table = \n", self.table)
-        # Color the whole table
-        self.color_whole_table()
-
-
-    def color_whole_table(self):
-        """
-        Subroutine
-        Color the whole table of entries based on current matrix values
-        """
-        N = len(self.names)
-        #self.min_val, self.max_val = self.table.min(), self.table.max()
-        for i in range(N):
-            for j in range(N):
-                if i <= j:
-                    color = self.compute_color(self.table[i,j], self.min_val, self.max_val)
-                    entry1, entry2 = self.entries[i][j-i]
-                    # Set the color for both entries
-                    entry1.configure(bg = color)
-                    if entry2 is not None:
-                        entry2.configure(bg = color)
-
+        for i in range(len(self.names)):
+            for j in range(len(self.names)):
+                item = self.tableWidget.item(i, j)
+                if item:
+                    color = self.compute_color(self.table[i, j], self.min_val, self.max_val)
+                    item.setBackground(QColor(color))
 
     def updateMatrix(self):
         """
@@ -280,6 +189,8 @@ class EventHandler:
 
         print('The update matrix is:\n', self.table)
 
+#===================================================# 
+
     def toXML(self):
         """
         Convert the edited n-by-n table to XML
@@ -287,24 +198,23 @@ class EventHandler:
         *** Simply just replace the variable strings
         """
         if self.table is None:
-            raise Exception("Copy paste here the XML content first!")
-        else:
-            # Update the stored matrix based on values in each Entry field
-            self.updateMatrix()
-            # Initialize the output text
-            self.rawXML = ''
-            for i, name1 in enumerate(self.names):
-                for j, name2 in enumerate(self.names):
-                    if i <= j: # Upper Triangular part
-                        self.rawXML += self.xml_format[0] + name1 + self.xml_format[1] + name2 + self.xml_format[2] + str(self.table[i,j]) + self.xml_format[3] + '\n'
-                self.rawXML += '\n'
+            QMessageBox.warning(None, "Error", "Copy paste here the XML content first!")
+            return
 
-            # Render it inside the text field
-            # Clear the text field first
-            self.text_field.delete("1.0", tk.END) # Line number starts at 1, character count starts at 0
-            self.text_field.insert("1.0", self.rawXML)
+        # Initialize the output text
+        self.rawXML = ''
+        for i, name1 in enumerate(self.names):
+            for j, name2 in enumerate(self.names):
+                if i <= j: # Upper Triangular part
+                    self.rawXML += self.xml_format[0] + name1 + self.xml_format[1] + name2 + self.xml_format[2] + str(self.table[i,j]) + self.xml_format[3] + '\n'
+            self.rawXML += '\n'
+
+        # Clear the text edit first and render the new XML
+        self.text_field.clear()
+        self.text_field.setPlainText(self.rawXML)
 
 
+#===================================================# 
 
     def newCell(self):
         """
@@ -315,10 +225,12 @@ class EventHandler:
 
         An extra row and an extra column will be added in the table with the new cell type    """
         while True:
-            user_input = simpledialog.askstring("Cell Name", "Enter the Name of the New Cell Type")
-            if user_input:
+            # Show input dialog to get user input
+            user_input, ok = QInputDialog.getText(None, "Cell Name", "Enter the Name of the New Cell Type")
+            if ok and user_input:
                 if user_input in self.names:
-                    messagebox.showwarning("Warning", "The Cell Name Already Exists, Please Enter a New One.")
+###
+                    QMessageBox.warning(None, "Warning", "The Cell Name Already Exists, Please Enter a New One.")
                 else:
                     # Append it to the list of cell types
                     self.names.append(user_input)
@@ -335,72 +247,32 @@ class EventHandler:
                     break
 
 
+#===================================================# 
 
+
+    def clearLayout(self, layout):
+        """
+        Clear all widgets from a layout
+        """
+        while layout.count():
+            item = layout.takeAt(0)
+            widget = item.widget()
+            if widget is not None:
+                widget.deleteLater()
 
     def clearTable(self):
         """
         Clear the table Contents
         """
-        for widget in self.frame4table.winfo_children():
-            widget.destroy()
+        '''
+        if self.tableWidget is not None:
+            self.frame4table.removeWidget(self.tableWidget)
+            self.tableWidget.deleteLater()
+            self.tableWidget = None
+        '''
+        self.clearLayout(self.frame4table)
         self.names = []
         self.table = None
 
-    def clearFrame(self, frame):
-        """
-        Clear the frame for re-rendering
-        """
-        for widget in frame.winfo_children():
-            widget.destroy()
 
-
-
-    class synced_entries:
-        """
-        Create Two Synced Entries that Share the Same Entry Value and the Same BG Color
-        *** Consider inherit from tk.Entry ***
-        """
-        def __init__(self, master, compute_color_func, table, indices, width = 5):
-            self.entry1 = tk.Entry(master = master, width = width)
-            self.entry2 = tk.Entry(master = master, width = width)
-
-            self.compute_color = compute_color_func
-            # Original matrix
-            self.table = table
-            self.min_val, self.max_val = self.table.min(), self.table.max()
-            # entry position inside the matrix
-            self.i, self.j = indices
-
-            # Bind them with sync method
-            #self.entry1.bind('<KeyRelease>', lambda event: self.sync(self.entry1))
-            #self.entry2.bind('<KeyRelease>', lambda event: self.sync(self.entry2))
-
-        def sync(self, src):
-            """Event Function to sync the entries based on the source entry """
-            value = float(src.get())
-            # update the min_max record
-            #if value < self.min_val:
-            #    self.min_val = value
-            #if value > self.max_val:
-            #    self.max_val = value
-            # update the table entry pair
-            #self.table[self.i, self.j] = self.table[self.j, self.i] = value
-            #self.min_val, self.max_val = self.table.min(), self.table.max()
-
-
-            #### The coloring part will be handled as an extra event function in the outter class
-            ####
-            #color = self.compute_color(value, self.min_val, self.max_val)
-            # Change current entry's color
-            #src.configure(bg = color)
-
-            if src == self.entry1:
-                self.entry2.delete(0, tk.END)
-                self.entry2.insert(0, value)
-                # change the twin entry's color
-                #self.entry2.configure(bg = color)
-            else:
-                self.entry1.delete(0, tk.END)
-                self.entry1.insert(0, value)
-                # change th twin entry's color
-                #self.entry1.configure(bg = color)
+#===================================================# 

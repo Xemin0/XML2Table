@@ -1,4 +1,4 @@
-# XML2Table (PyQt5 Version; *In Progress*)
+# XML2Table (PyQt5 Version)
 A demo python GUI widget meant to facilate the parameter-settings (Contact Energies) in [CompCell3D](https://compucell3d.org/) [Git Page](https://github.com/CompuCell3D/CompuCell3D) using `PyQt5`
 
 It simply converts between the copy-pasted XML contents and a visual table. XML parsing is done using regular expressions. 
@@ -44,12 +44,14 @@ Then each button literally does what it says.
 - The whole table's colors are updated for each change in any entry value
 - The color dynamically assigned to each entry is determined based on its relative position with respect to the min_max values of the current table
 
-<!---
 ### Example Image of the Widget
-<img src="./images/example_v02_2.png">
--->
+<img src="./images/example_pyqt.png">
 
-### Major Issues:                                                                                            
+### Major Issues:
+- `conda` recipe, workflow not updated for PyQt version
+- Static size and rendering of ColorBar
+- Minimum sizes for various components
+- XML parsing method does not preseve the ordering of cell types appeared
 - The colors are not equally spaced (as in the color bar)
 
 
