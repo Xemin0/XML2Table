@@ -50,7 +50,7 @@ Then each button literally does what it says.
 ### Major Issues:
 - `xml_parser` does not do format or syntax checks (always assumes the input from usr is correct)
 - `xml_parser` does not check the parameters' type in CC3D (e.g. Contact Energy, etc)
-- `conda` recipe, workflow not updated for PyQt version
+- `conda` recipe, workflow updated but not tested yet for the PyQt version
 - Static size and rendering of ColorBar
 - Minimum sizes for various components
 - ~XML parsing method does not preseve the ordering of cell types appeared~

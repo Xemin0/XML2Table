@@ -17,6 +17,7 @@ requirements:
     run:
         - python >=3.8
         - numpy >=1.8*
+        - pyqt >=5.0
 
 about:
     home: https://github.com/Xemin0/XML2Table
