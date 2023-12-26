@@ -37,7 +37,26 @@ def getNames(xml):
     for line in xml.split('\n'):
        str_list = line.split('"')
        names += [str_list[1]] + [str_list[3]]
-    return set(names) ### Does not preseve the ordering
+    # set returns in a lexicographical order
+    #return set(names) ### Does not preseve the ordering
+    return unique_entries(names)
+
+def unique_entries(lst):
+    '''
+    Utility: Return the Unique Entries in a List (Perserves the Ordering)
+    **** High Time Complexity ****
+    '''
+    if type(lst) is not list:
+        raise TypeError("The input must be a list.")
+    else:
+        unique_list = []
+        #assert len(lst) > 0, "There must be at least one element in the list."
+        for e in lst:
+            if e in unique_list:
+                continue
+            else:
+                unique_list.append(e)
+    return unique_list
 
 def names_and_values(xml):
     """
@@ -81,7 +100,7 @@ def names_and_values(xml):
             edges.append([value, name1, name2])
 
     ##### !! Does not preserve the ordering !! ####
-    unique_names = list(set(t[1] for t in edges) | set(t[2] for t in edges))
+    unique_names = unique_entries([t[1] for t in edges] + [t[2] for t in edges])
     # Re-arrange to make 'Medium' the default type to be the first, if included
     if 'Medium' in unique_names:
         unique_names.remove('Medium')
